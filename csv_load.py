@@ -6,5 +6,5 @@ file_path = 'C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - 
 with open(file_path, 'r', newline = '') as csv_f:
     data = list(csv.reader(csv_f))
 
-# print headers
+# print headers 
 print(data[0])
