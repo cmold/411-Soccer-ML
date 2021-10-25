@@ -21,8 +21,9 @@ def rating_update(expected_outcome, actual_outcome, teamA, teamB, kval):
     n = 0
     for i in expected_outcome:
         teamA_rating = (teamA + kval*(actual_outcome[n] - i))
-        teamB_rating = (teamB + kval*((1-actual_outcome[n]) - abs(i - 1))
+        teamB_rating = (teamB + kval*((1-actual_outcome[n]) - abs(i - 1)))
 
         n += 1
+    return(teamA_rating, teamB_rating
 
 print(expected_outcome(1900, 1500))
