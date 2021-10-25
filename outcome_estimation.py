@@ -1,6 +1,7 @@
 # Function to estimate outcome of two teams given their rating
 # Takes two ratings as parameters
 # Returns the expected outcome of their game, winning team and expected probability of winning
+# https://en.wikipedia.org/wiki/Elo_rating_system#Theory
 def expected_outcome(ratingA, ratingB):
     outcome = ''
     expectedA = (1/(1+10**((ratingB - ratingA)/400)))
