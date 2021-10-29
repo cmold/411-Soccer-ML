@@ -11,19 +11,16 @@ file_path = 'C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - 
 with open(file_path, "w", newline = '') as csv_f:
     datawriter = csv.writer(csv_f, delimiter = ',')
     rowdata = []
-    # Loop through each row
     for i in data:
         rowdata = []
         n = 0
-        # Loop through each column of current row
         for j in i:
-            # Check if using the FTR column
             if n == 6:
-                # Set home team wins to 1, all else to 0
                 if j == 'H':
                     j = 1
-                else:
+                elif j in ['A', 'D']:
                     j = 0
             rowdata.append(j)
             n += 1
+        
         datawriter.writerow(rowdata)
