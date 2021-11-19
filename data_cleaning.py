@@ -21,7 +21,7 @@ with open(file_path, "w", newline = '') as csv_f:
                 elif j == 'A':
                     j = 0
                 elif j == 'D':
-                    j = 3
+                    j = 2
             rowdata.append(j)
             n += 1
         
