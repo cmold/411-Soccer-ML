@@ -29,4 +29,23 @@ def rating_update(expected_outcome, actual_outcome, teamA, teamB, kval):
         n += 1
     return(teamA_rating, teamB_rating)
 
-print(expected_outcome(1900, 1500))
+# Function to run each game and update the teams elo rating
+# Takes no parameters
+# Returns no values
+def run_games():
+
+    # Loop through each data point (game)
+    for i in data[1:]:
+        home = i[2]
+        away = i[3]
+        winner = i[6]
+
+        if winner == '1':
+            results = rating_update(expected_outcome(teams[home], teams[away])[1], 1, teams[home], teams[away], 35)
+            teams[home] = results[0]
+            teams[away] = results[1]
+
+        if winner == '0':
+            results = rating_update(expected_outcome(teams[away], teams[home])[1], 0, teams[away], teams[home], 35)
+            teams[home] = results[1]
+            teams[away] = results[0]
