@@ -18,8 +18,10 @@ with open(file_path, "w", newline = '') as csv_f:
             if n == 6:
                 if j == 'H':
                     j = 1
-                elif j in ['A', 'D']:
+                elif j == 'A':
                     j = 0
+                elif j == 'D':
+                    j = 3
             rowdata.append(j)
             n += 1
         
