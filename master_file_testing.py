@@ -1,5 +1,6 @@
 
 import csv
+import numpy as np
 
 # Function to estimate outcome of two teams given their rating
 # Takes two ratings as parameters
@@ -31,22 +32,29 @@ def run_games(data, teams):
 
     # Loop through each data point (game)
     print(len(data[1]))
-    for i in data[1:len(data) -3]:
+    for i in data[1:len(data) - 3]:
         home = i[2]
         away = i[3]
         winner = i[6]
 
         if winner == '1':
-            results = rating_update(expected_outcome(teams[home], teams[away])[1], 1, teams[home], teams[away], 35)
+            results = rating_update(expected_outcome(teams[home], teams[away])[1], 1, teams[home], teams[away], 25)
             teams[home] = results[0]
             teams[away] = results[1]
 
         if winner == '0':
-            results = rating_update(expected_outcome(teams[away], teams[home])[1], 0, teams[away], teams[home], 35)
+            results = rating_update(expected_outcome(teams[away], teams[home])[1], 0, teams[away], teams[home], 25)
             teams[home] = results[1]
             teams[away] = results[0]
         
     return(teams)
+
+# function to compare 2 teams
+def outcome_pr(teams):
+    team_a = input("Home Team: ")
+    team_b = input("Away Team: ")
+
+    print(teams[team_a], teams[team_b])
 
 def main():
     file_path = 'C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - Computer Applications/soccer data/soccer_data2.csv'
@@ -60,5 +68,6 @@ def main():
             teams[i[2]] = 1200
 
     print(run_games(data, teams))
+    outcome_pr(teams)
 
 main()
