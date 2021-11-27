@@ -68,7 +68,14 @@ def outcome_pr(teams):
     team_a = input("Home Team: ")
     team_b = input("Away Team: ")
 
-    print(teams[team_a], teams[team_b])
+    if teams[team_a] > teams[team_b]:
+        print(f'{team_a} will win')
+    
+    elif teams[team_a] < teams[team_b]:
+        print(f'{team_b} will win')
+    
+    else:
+        print('Draw')
 
 def main():
     file_path = 'C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - Computer Applications/soccer data/soccer_data2.csv'
