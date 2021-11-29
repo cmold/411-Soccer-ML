@@ -4,8 +4,13 @@
 # https://en.wikipedia.org/wiki/Elo_rating_system#Theory
 def expected_outcome(ratingA, ratingB):
     outcome = ''
+    e = 0
     expectedA = (1/(1+10**((ratingB - ratingA)/400)))
     expectedB = (1/(1+10**((ratingA - ratingB)/400)))
+    
+    # New expected outcome using e
+    expectedA_new = (1/(1+e**((ratingB - ratingA)/400)))
+    expectedB_new = (1/(1+e**((ratingA - ratingB)/400)))
 
     if expectedA > expectedB:
         outcome = 'Team A'
