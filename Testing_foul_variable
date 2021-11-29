@@ -6,6 +6,8 @@ import numpy as np
 # Returns the expected outcome of their game, winning team and expected probability of winning
 # https://en.wikipedia.org/wiki/Elo_rating_system#Theory
 
+# Accuracy test of 55%
+
 def expected_outcome(ratingA, ratingB):
     outcome = ''
     expectedA = (1/(1+10**((ratingB - ratingA)/400)))
@@ -141,4 +143,3 @@ def main():
 
 main()
 
-# Accuracy test of 55%
