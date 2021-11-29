@@ -6,7 +6,7 @@ import numpy as np
 # Returns the expected outcome of their game, winning team and expected probability of winning
 # https://en.wikipedia.org/wiki/Elo_rating_system#Theory
 
-# Accuracy test of 55%
+# Accuracy test of 58%
 
 def expected_outcome(ratingA, ratingB):
     outcome = ''
@@ -25,8 +25,9 @@ def expected_outcome(ratingA, ratingB):
 # Function to update two teams ratings after a match
 def rating_update(expected_outcome, actual_outcome, teamA, teamB, KVAL, goal_difference, foul_difference):
     
-    teamA_rating = (teamA + (0.6*KVAL)*(actual_outcome - expected_outcome) + (0.35*KVAL) * goal_difference - (0.05*KVAL) * foul_difference)
-    teamB_rating = (teamB + (0.6*KVAL)*((1-actual_outcome) - abs(expected_outcome - 1)) + (0.35*KVAL) * goal_difference - (0.05*KVAL) * foul_difference)
+    teamA_rating = (teamA + (0.4*KVAL)*(actual_outcome - expected_outcome) + (0.55*KVAL) * goal_difference - (0.05*KVAL) * foul_difference)
+    teamB_rating = (teamB + (0.4*KVAL)*((1-actual_outcome) - abs(expected_outcome - 1)) + (0.55*KVAL) * goal_difference - (0.05*KVAL) * foul_difference)
+
 
     return(teamA_rating, teamB_rating)
 
