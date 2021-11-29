@@ -21,12 +21,20 @@ def expected_outcome(ratingA, ratingB):
         return(outcome, 1)
     
 # Function to update two teams ratings after a match
-def rating_update(expected_outcome, actual_outcome, teamA, teamB, KVAL, ind_variables):
+def rating_update(expected_outcome, actual_outcome, winner, loser, KVAL, ind_variables):
     
-    teamA_rating = (teamA + (0.9*KVAL)*(actual_outcome - expected_outcome) + (0.1*KVAL) * ind_variables['Goal Difference'])
-    teamB_rating = (teamB + (0.9*KVAL)*((1-actual_outcome) - abs(expected_outcome - 1)) + (0.1*KVAL) * ind_variables['Goal Difference'])
+    winner_rating = (winner + (0.7*KVAL)*(actual_outcome - expected_outcome) + 
+    ((0.1*KVAL) * ind_variables['Goal Difference']) + 
+    ((0.1*KVAL) * ind_variables['Foul Difference']) + 
+    ((0.1*KVAL) * ind_variables['Shots Taken']))
 
-    return(teamA_rating, teamB_rating)
+
+    loser_rating = (loser + (0.7*KVAL)*((1-actual_outcome) - abs(expected_outcome - 1)) + 
+    ((0.1*KVAL) * ind_variables['Goal Difference']) + 
+    ((0.1*KVAL) * ind_variables['Foul Difference']) + 
+    ((0.1*KVAL) * ind_variables['Shots Taken']))
+
+    return(winner_rating, loser_rating)
 
 # Function that takes sample data to create our elo model
 # Takes csv data, teams dictionary, kvalue, and all independent variables as parameters
@@ -43,7 +51,8 @@ def run_games(data, teams, KVAL, ind_variables):
         goals_home = int(i[4])
         goals_away = int(i[5])
 
-        
+        ind_variables['Shots Taken'] = int(i[13]) - int(i[14])
+        ind_variables['Foul Difference'] = int(i[15]) - int(i[16])
         ind_variables['Goal Difference'] = int(goals_home) - int(goals_away)
 
         if winner == '1':
@@ -62,11 +71,12 @@ def run_games(data, teams, KVAL, ind_variables):
 # function to compare 2 teams
 def outcome_pr(teams, home_team, away_team):
 
-    if teams[home_team] > teams[away_team]:
+    # Check the elo of the teams and weight the winner with a range for draws
+    if teams[home_team] > teams[away_team] + 40:
         #print(f'{home_team} will win')
         return(home_team)
     
-    elif teams[home_team] < teams[away_team]:
+    elif teams[home_team] < teams[away_team] - 40:
         #print(f'{away_team} will win')
         return(away_team)
     
@@ -104,6 +114,8 @@ def ML_prediction(data, teams, KVAL):
         goals_home = int(i[4])
         goals_away = int(i[5])
 
+        ind_variables['Shots Taken'] = int(i[13]) - int(i[14])
+        ind_variables['Foul Difference'] = int(i[15]) - int(i[16])
         ind_variables['Goal Difference'] = int(goals_home) - int(goals_away)
 
         if winner == '1':
@@ -120,7 +132,7 @@ def ML_prediction(data, teams, KVAL):
     print("The result is a %s" %(correct/(correct+wrong)))
 
 def main():
-    KVAL = 15
+    KVAL = 20
     ind_variables = {}
 
     file_path = 'C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - Computer Applications/soccer data/soccer_data2.csv'
