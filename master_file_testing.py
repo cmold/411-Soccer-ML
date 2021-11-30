@@ -38,7 +38,7 @@ def rating_update(expected_outcome, actual_outcome, winner, loser, KVAL, ind_var
         actual_outcome (int): Actual match outcome
         winner (string): The team who won
         loser (string): The team who lost
-        KVAL (int): 
+        KVAL (int): Determines how fast the rating reacts to changes and new data
         ind_variables (dict): Dictionary with variable name as key and coefficient as value
         gd_mult (float): Goal Difference multiplier
 
@@ -71,7 +71,7 @@ def run_games(data, teams, KVAL, ind_variables):
     Args:
         data (csv): CSV file
         teams (dict): Dictionary with variable name as key and coefficient as value
-        KVAL (int): 
+        KVAL (int): Determines how fast the rating reacts to changes and new data
         ind_variables (dict): Dictionary with variable name as key and coefficient as value
 
     Returns:
@@ -134,7 +134,7 @@ def ML_prediction(data, teams, KVAL, gd_mult):
     Args:
         data (list): The data for soccer matches
         teams (dict): Dictionary with variable name as key and coefficient as value
-        KVAL (int): 
+        KVAL (int): Determines how fast the rating reacts to changes and new data
         gd_mult (float): Goal Difference multiplier
 
     Returns:
