@@ -32,7 +32,8 @@ def preproccessing(dataframe):
         .merge(dummy_referee, left_index=True, right_index=True)
 
     # Drop columns used for creating dummy variables
-    soccer_no_dup.drop(columns=['HomeTeam', 'AwayTeam', 'FTR', 'HTR', 'Referee'], inplace=True)
+    to_drop = ['HomeTeam', 'AwayTeam', 'FTR', 'HTR', 'Referee']
+    soccer_no_dup.drop(columns=to_drop, inplace=True)
 
     # Feature engineer new variables
     # Note: series.sub(other series) = series - other series
@@ -44,12 +45,13 @@ def preproccessing(dataframe):
     soccer_no_dup['Yellow Card Difference'] = soccer_no_dup.HY.sub(soccer_no_dup.AY)
 
     # Drop variables used for feature engineering
-    soccer_no_dup.drop(columns=['HTHG', 'HTAG', 'HS', 'AS', 'HST', 'AST', 'HF', 'AF', 'HC', 'AC', 'HY', 'AY'], inplace=True)   
+    to_drop = ['HTHG', 'HTAG', 'HS', 'AS', 'HST', 'AST', 'HF', 'AF', 'HC', 'AC', 'HY', 'AY']
+    soccer_no_dup.drop(columns=to_drop, inplace=True)   
 
 
 def run_model():
     '''
-    Runs a random forest model and plots the estimated coefficients of feature importance
+    Runs a random forest model and returns the estimated coefficients of feature importance
     
     Returns:
         Series (pd.Series): Pandas series object
@@ -59,6 +61,7 @@ def run_model():
     y = soccer_no_dup[['FTR_D', 'FTR_H']]
 
     # Splits the data into 70% training and 30% testing
+    # Note: random_state lets you and others using this code to generate the same results
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=123)
 
     # Fit model to data
@@ -71,7 +74,7 @@ def run_model():
 
 def plot_feat_imp(series):
     '''
-    Plots the feature importance 
+    Plots the feature importance coefficients
     
     Args:
         series (pd.Series): Pandas series object
@@ -91,15 +94,17 @@ def plot_feat_imp(series):
 
     # Saves plot into working directory
     # plt.savefig('feat_import.jpg')
-
     plt.show()
 
 
 def main():    
     # Read in data
     soccer = pd.read_csv(os.getcwd() + '/data/soccer_data.csv', parse_dates=['Date'])
+    # Clean data
     preproccessing(soccer)
+    # Get feature importances
     series = run_model()
+    # Plot results
     plot_feat_imp(series)
 
 
