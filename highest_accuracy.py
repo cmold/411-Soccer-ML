@@ -61,22 +61,37 @@ def rating_update(expected_outcome, winner, loser, winner_kval, loser_kval, ind_
     """
 
     winner_rating = (winner + (winner_kval)*(expected_outcome[0]) + 
-    (0.40*ind_variables['Goal Difference']) -
-    (0.20*ind_variables['Foul Difference']) + 
-    (0.20*ind_variables['Shots Taken']) +
-    (0.20*ind_variables['Corners']))
+    (0.2*ind_variables['Goal Difference']) -
+    (0.0657*ind_variables['Foul Difference']) + 
+    (0.0867*ind_variables['Shots Taken']) +
+    (0.0638*ind_variables['Corners']))
 
     # Subtract variable factors
     # e.g. if goal diff is negative, away team won, so the second line will add to their rating
     # and take away from home teams rating
     loser_rating = (loser - (loser_kval)*(expected_outcome[1]) - 
-    (0.40*ind_variables['Goal Difference']) + 
-    (0.20*ind_variables['Foul Difference']) - 
-    (0.20*ind_variables['Shots Taken']) -
-    (0.20*ind_variables['Corners']))
+    (0.2*ind_variables['Goal Difference']) -
+    (0.0657*ind_variables['Foul Difference']) + 
+    (0.0867*ind_variables['Shots Taken']) +
+    (0.0638*ind_variables['Corners']))
 
     return(winner_rating, loser_rating)
 
+def rating_update_draw(expected_outcome, home, away, home_k, away_k, ind_variables):
+    """
+    Updates teams ratings if their games resulted in a draw
+
+    Args:
+        expected_outcome (float): Expected match outcome based on ratings
+        home {string): Home team name
+        away (string): Away team name
+        home_k (int): Home team kval
+        away_k (int): Away team kval
+        ind_variables (dict): Dictionary with variable name as key and coefficient as value 
+    """
+    home_rating = (home - (home_k * (expected_outcome[0] - expected_outcome[1])))
+    away_rating = (away - (away_k * (expected_outcome[1] - expected_outcome[0])))
+    return(home_rating, away_rating)
 
 def run_games(data, teams, cols, KVAL, ind_variables):
     """
@@ -135,6 +150,15 @@ def run_games(data, teams, cols, KVAL, ind_variables):
             teams[home] = results[1]
             teams[away] = results[0]
 
+        # Find results if game was a draw
+        if winner == '0.5':
+            home_k = team_kval[1]
+            away_k = team_kval[0]
+            
+            results = rating_update_draw(expected_outcome(teams[home], teams[away]), teams[home], teams[away], home_k, away_k, ind_variables)
+            teams[home] = results[0]
+            teams[away] = results[1]
+
     return(teams)
 
 
@@ -158,6 +182,8 @@ def outcome_pr(teams, home_team, away_team, gap, home_advantage):
     elif teams[home_team] + home_advantage < teams[away_team] - gap:
         return(away_team)
     
+    else:
+        return('Draw')
 
 
 def ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE):
@@ -244,11 +270,19 @@ def ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE):
             results = rating_update(expected_outcome(teams[away], teams[home]), teams[away], teams[home], winner_kval, loser_kval, ind_variables)
             teams[home] = results[1]
             teams[away] = results[0]
+
+        if winner == '0.5':
+            home_k = team_kval[1]
+            away_k = team_kval[0]
+            
+            results = rating_update_draw(expected_outcome(teams[home], teams[away]), teams[home], teams[away], home_k, away_k, ind_variables)
+            teams[home] = results[0]
+            teams[away] = results[1]
     
-    print('Predicted Home but Away: ' + str(round(home_but_away/wrong, 4)) + '%')
-    print('Predicted Away but Home: ' + str(round(away_but_home/wrong, 4)) + '%')
-    print('Predicted Draw but Not: ' + str(round(draw_but_not/wrong, 4)) + '%')
-    print('Predicted Not Draw but Draw: ' + str(round(notdraw_but_draw/wrong, 4)) + '%')
+    print('Predicted Home but Away: ' + str(round(home_but_away/wrong*100, 4)) + '%')
+    print('Predicted Away but Home: ' + str(round(away_but_home/wrong*100, 4)) + '%')
+    print('Predicted Draw but Not: ' + str(round(draw_but_not/wrong*100, 4)) + '%')
+    print('Predicted Not Draw but Draw: ' + str(round(notdraw_but_draw/wrong*100, 4)) + '%')
     res1 = "The model has predicted %s games correctly and %s games incorrectly out of %s total games" %(correct, wrong, correct+wrong)
     accuracy = np.round(correct/(correct+wrong), 4)
     return(res1, accuracy)
@@ -261,17 +295,22 @@ def graph_output(teams):
     min_val = min(data)
     max_val = max(data)
     
-    plt.hist(data, bins=range(min_val, max_val + 75, 75), edgecolor="k")
+    plt.hist(data, bins=range(min_val, max_val + 45, 45), edgecolor="k")
+    plt.title("ELO Distribution")
+    plt.xlabel("ELO")
+    plt.ylabel("# of Teams")
     #plt.xticks(bins)
     plt.show()
 
 def main():
+    # Base ELO
+    ELO = 1200
     # KVAL for elo ranges, below 2100, 2100-2400, above 2400
     KVAL = [32, 24, 16]
     # Elo range for predicting draws
     GAP = 0
     # Bonus elo for a home team
-    HOME_ADVANTAGE = 150
+    HOME_ADVANTAGE = 200
     ind_variables = {}
 
     file_path = 'C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - Computer Applications/soccer data/soccer_data2.csv'
@@ -284,12 +323,23 @@ def main():
     teams = {}
     for i in data[1:]:
         if i[cols['HomeTeam']] not in teams:
-            teams[i[cols['HomeTeam']]] = 1200
+            teams[i[cols['HomeTeam']]] = ELO
         if i[cols['AwayTeam']] not in teams:
-            teams[i[cols['AwayTeam']]] = 1200
+            teams[i[cols['AwayTeam']]] = ELO
 
     print(run_games(data, teams, cols, KVAL, ind_variables))
     print(ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE))
 
     graph_output(teams)
+
+    with open('C:/Users/codym/OneDrive - University of Calgary/Desktop/Econ 411 - Computer Applications/soccer data/results.csv', 'w', newline = '') as csv_file:
+        fieldnames = ['Team', 'ELO']
+        writer = csv.DictWriter(csv_file, fieldnames = fieldnames)
+
+        writer.writeheader()
+        while len(teams) > 0:
+            maxkey = max(teams, key=teams.get)
+            writer.writerow({'Team':maxkey, 'ELO': str(round(teams[maxkey], 2))})
+            print(maxkey + ": " + str(round(teams[maxkey], 2)))
+            del teams[maxkey]
 main()
