@@ -78,8 +78,8 @@ def rating_update(expected_outcome, winner, loser, winner_kval, loser_kval, ind_
     # and take away from home teams rating
     loser_rating = (loser - (loser_kval)*(expected_outcome[1]) - 
     (0.2*ind_variables['Goal Difference']) -
-    (0.004*ind_variables['Foul Difference']) + 
-    (0.013*ind_variables['Shots Taken']) +
+    (0.004*ind_variables['Foul Difference']) - 
+    (0.013*ind_variables['Shots Taken']) *
     (0.005*ind_variables['Corners']))
 
     return(winner_rating, loser_rating)
@@ -155,16 +155,15 @@ def run_games(data, team_name, teams, cols, KVAL, ind_variables):
         # get kvalues for elo ranges
         team_kval = kval_range(teams[home], teams[away], KVAL)
 
-        # Calculate the independent variable differences
-        ind_variables['Corners'] = int(i[cols['HC']]) - int(i[cols['AC']])
-        ind_variables['Shots Taken'] = int(i[cols['HST']]) - int(i[cols['AST']])
-        ind_variables['Foul Difference'] = int(i[cols['HF']]) - int(i[cols['AF']])
-        ind_variables['Goal Difference'] = int(i[cols['FTHG']]) - int(i[cols['FTAG']])
-
         # Find results if winner is the home team
         if winner == '1':
             winner_kval = team_kval[0]
             loser_kval = team_kval[1]
+            # Calculate the independent variable differences
+            ind_variables['Corners'] = int(i[cols['HC']]) - int(i[cols['AC']])
+            ind_variables['Shots Taken'] = int(i[cols['HST']]) - int(i[cols['AST']])
+            ind_variables['Foul Difference'] = int(i[cols['HF']]) - int(i[cols['AF']])
+            ind_variables['Goal Difference'] = int(i[cols['FTHG']]) - int(i[cols['FTAG']])
             results = rating_update(expected_outcome(teams[home], teams[away]), teams[home], teams[away], winner_kval, loser_kval, ind_variables)
             teams[home] = results[0]
             teams[away] = results[1]
@@ -173,6 +172,11 @@ def run_games(data, team_name, teams, cols, KVAL, ind_variables):
         if winner == '0':
             winner_kval = team_kval[1]
             loser_kval = team_kval[0]
+            # Calculate the independent variable differences
+            ind_variables['Corners'] = int(i[cols['AC']]) - int(i[cols['HC']])
+            ind_variables['Shots Taken'] = int(i[cols['AST']]) - int(i[cols['HST']])
+            ind_variables['Foul Difference'] = int(i[cols['AF']]) - int(i[cols['HF']])
+            ind_variables['Goal Difference'] = int(i[cols['FTAG']]) - int(i[cols['FTHG']])
             results = rating_update(expected_outcome(teams[away], teams[home]), teams[away], teams[home], winner_kval, loser_kval, ind_variables)
             teams[home] = results[1]
             teams[away] = results[0]
@@ -270,15 +274,15 @@ def ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE):
 
         # get kvalues from elo ranges
         team_kval = kval_range(teams[home], teams[away], KVAL)
-
-        ind_variables['Corners'] = int(i[cols['HC']]) - int(i[cols['AC']])
-        ind_variables['Shots Taken'] = int(i[cols['HST']]) - int(i[cols['AST']])
-        ind_variables['Foul Difference'] = int(i[cols['HF']]) - int(i[cols['AF']])
-        ind_variables['Goal Difference'] = int(i[cols['FTHG']]) - int(i[cols['FTAG']])
         
         if winner == '1':
             winner_kval = team_kval[0]
             loser_kval = team_kval[1]
+            # Calculate the independent variable differences
+            ind_variables['Corners'] = int(i[cols['HC']]) - int(i[cols['AC']])
+            ind_variables['Shots Taken'] = int(i[cols['HST']]) - int(i[cols['AST']])
+            ind_variables['Foul Difference'] = int(i[cols['HF']]) - int(i[cols['AF']])
+            ind_variables['Goal Difference'] = int(i[cols['FTHG']]) - int(i[cols['FTAG']])
             results = rating_update(expected_outcome(teams[home], teams[away]), teams[home], teams[away], winner_kval, loser_kval, ind_variables)
             teams[home] = results[0]
             teams[away] = results[1]
@@ -286,6 +290,11 @@ def ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE):
         if winner == '0':
             winner_kval = team_kval[1]
             loser_kval = team_kval[0]
+            # Calculate the independent variable differences
+            ind_variables['Corners'] = int(i[cols['AC']]) - int(i[cols['HC']])
+            ind_variables['Shots Taken'] = int(i[cols['AST']]) - int(i[cols['HST']])
+            ind_variables['Foul Difference'] = int(i[cols['AF']]) - int(i[cols['HF']])
+            ind_variables['Goal Difference'] = int(i[cols['FTAG']]) - int(i[cols['FTHG']])
             results = rating_update(expected_outcome(teams[away], teams[home]), teams[away], teams[home], winner_kval, loser_kval, ind_variables)
             teams[home] = results[1]
             teams[away] = results[0]
@@ -397,7 +406,6 @@ def data_cleaning(csv_path):
         datawriter = csv.writer(csv_f, delimiter = ',')
         rowdata = []
         for i in data:
-            print(i)
             if i[0] != '':
                 rowdata = []
                 n = 0
