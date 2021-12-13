@@ -8,11 +8,10 @@ elo system used in our algorithm to predict the outcome of future games.
 The basis of our elo system was created in similarity to the chess method:
 https://en.wikipedia.org/wiki/Elo_rating_system#Theory
 """
-
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
+
 
 def column_find(data):
     """
@@ -33,6 +32,7 @@ def column_find(data):
         n += 1
     return(col_loc)
 
+
 def expected_outcome(winner, loser):
     """
     Estimate outcome of two teams given their rating
@@ -50,6 +50,7 @@ def expected_outcome(winner, loser):
     expectedDraw = expectedWin - expectedLoss
 
     return(expectedWin, expectedLoss, expectedDraw)
+
 
 def rating_update(expected_outcome, winner, loser, winner_kval, loser_kval, ind_variables):
     """
@@ -84,6 +85,7 @@ def rating_update(expected_outcome, winner, loser, winner_kval, loser_kval, ind_
 
     return(winner_rating, loser_rating)
 
+
 def rating_update_draw(expected_outcome, home, away, home_k, away_k, ind_variables):
     """
     Updates teams ratings if their games resulted in a draw
@@ -99,6 +101,7 @@ def rating_update_draw(expected_outcome, home, away, home_k, away_k, ind_variabl
     home_rating = (home - (home_k * (expected_outcome[0] - expected_outcome[1])))
     away_rating = (away - (away_k * (expected_outcome[1] - expected_outcome[0])))
     return(home_rating, away_rating)
+
 
 def kval_range(home, away, KVAL):
     """
@@ -125,6 +128,7 @@ def kval_range(home, away, KVAL):
         n += 1
 
     return(team_kval)
+
 
 def run_games(data, team_name, teams, cols, KVAL, ind_variables):
     """
@@ -197,6 +201,7 @@ def run_games(data, team_name, teams, cols, KVAL, ind_variables):
 
     return(teams, team_vals, games_played)
 
+
 def outcome_pr(teams, home_team, away_team, gap, home_advantage):
     """
     Compares two teams
@@ -217,6 +222,7 @@ def outcome_pr(teams, home_team, away_team, gap, home_advantage):
         return(away_team)
     else:
         return('Draw')
+    
 
 def ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE):
     """
@@ -315,6 +321,7 @@ def ML_prediction(data, teams, cols, KVAL, GAP, HOME_ADVANTAGE):
     accuracy = np.round(correct/(correct+wrong), 4)
     return(res1, accuracy)
 
+
 def graph_output(teams):
     """
     Args:
@@ -334,6 +341,7 @@ def graph_output(teams):
     plt.xlabel("ELO")
     plt.ylabel("# of Teams")
     plt.show()
+    
 
 def team_growth(name, elo, games_played):
     """
@@ -351,6 +359,7 @@ def team_growth(name, elo, games_played):
     plt.ylabel('ELO')
     plt.show()
 
+
 def user_input(teams):
     """
     Takes user input for which team they want to graph
@@ -367,6 +376,7 @@ def user_input(teams):
         team = input("%s\nInput a team name to see their Elo change: " %teams.keys())
 
     return(team)
+
 
 def add_teams(teams, data, cols, ELO):
     """
@@ -386,6 +396,7 @@ def add_teams(teams, data, cols, ELO):
         if i[cols['AwayTeam']] not in teams:
             teams[i[cols['AwayTeam']]] = ELO
     return(teams)
+
 
 def data_cleaning(csv_path):
     """
@@ -422,6 +433,7 @@ def data_cleaning(csv_path):
                 
                 datawriter.writerow(rowdata)
 
+                
 def main():
     # Base ELO
     ELO = 1200
@@ -483,5 +495,6 @@ def main():
             maxkey = max(teams, key=teams.get)
             print(maxkey + ": " + str(round(teams[maxkey], 2)))
             del teams[maxkey]
+
 
 main()
