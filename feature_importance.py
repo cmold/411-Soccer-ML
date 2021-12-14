@@ -11,6 +11,9 @@ def preproccessing(dataframe):
     Takes messy data and cleans it
     Args:
         df (csv): CSV file
+
+    Returns:
+        DataFrame (pd.DataFrame): Pandas dataframe object
     '''
     # Drop all duplicated rows
     soccer_no_dup = dataframe.drop_duplicates().iloc[:-1]
@@ -55,6 +58,7 @@ def preproccessing(dataframe):
     to_drop = ['HTHG', 'HTAG', 'HS', 'AS', 'HST',
                'AST', 'HF', 'AF', 'HC', 'AC', 'HY', 'AY']
     soccer_no_dup.drop(columns=to_drop, inplace=True)
+    return soccer_no_dup
 
 
 def run_model(data):
@@ -102,18 +106,18 @@ def plot_feat_imp(series):
                  color='white')
 
     # Saves plot into working directory
-    # plt.savefig('feat_import.jpg')
+    plt.savefig('feat_import.jpg')
     plt.show()
 
 
 def main():
     # Read in data
     soccer = pd.read_csv(
-        os.getcwd() + '/data/soccer_data.csv', parse_dates=['Date'])
+        os.getcwd() + '/Project/data/soccer_data.csv', parse_dates=['Date'])
     # Clean data
-    preproccessing(soccer)
+    soccer_clean = preproccessing(soccer)
     # Get feature importances
-    series = run_model(soccer)
+    series = run_model(soccer_clean)
     # Plot results
     plot_feat_imp(series)
 
